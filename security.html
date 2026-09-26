@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Security Testing Dashboard | Permission-Aware RAG{% endblock %}
+
+{% block header_title %}Automated Security & Permission Verification{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h2 style="font-size: 1.4rem; margin-bottom: 4px;">Automated Security Test Suite</h2>
+            <p style="color: var(--muted-color); font-size: 0.9rem;">
+                Run real-time verification tests to validate that unauthorized documents are blocked prior to vector search and LLM context.
+            </p>
+        </div>
+
+        <button id="runTestsBtn" class="btn btn-primary" onclick="runSecuritySuite()">
+            ⚡ Run Automated Security Test Suite
+        </button>
+    </div>
+</div>
+
+<!-- Security Score summary banner -->
+<div id="summaryBanner" class="glass-card" style="margin-bottom: 24px; display: none;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div id="scoreBadge" style="width: 64px; height: 64px; border-radius: 50%; background: var(--mint); color: #1C4532; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700;">
+                100%
+            </div>
+            <div>
+                <h3 id="scoreTitle" style="font-size: 1.3rem;">All Permission Isolation Tests Passed</h3>
+                <p id="scoreSubtitle" style="color: var(--muted-color); font-size: 0.85rem;">Pre-retrieval metadata filtering prevented 100% of unauthorized document exposures.</p>
+            </div>
+        </div>
+        <div id="testCounts" style="font-size: 0.95rem; font-weight: 600;">
+            Passed: <span id="passedCount" style="color: var(--success-color);">5</span> / <span id="totalCount">5</span>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Test Case Name</th>
+                <th>Role & Department</th>
+                <th>Query Tested</th>
+                <th>Expected</th>
+                <th>Actual</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody id="testResultsBody">
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 36px; color: var(--muted-color);">
+                    Click <strong>"Run Automated Security Test Suite"</strong> to execute live pre-retrieval isolation checks.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+async function runSecuritySuite() {
+    const btn = document.getElementById('runTestsBtn');
+    const tbody = document.getElementById('testResultsBody');
+    const banner = document.getElementById('summaryBanner');
+
+    btn.disabled = true;
+    btn.innerHTML = '⚡ Executing 5 Security Test Scenarios...';
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="6" style="text-align: center; padding: 36px;">
+                <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary); margin-bottom: 8px;">🛡️ Running Permission Isolation Verification...</div>
+                <div style="font-size: 0.85rem; color: var(--muted-color);">Evaluating pre-retrieval vector metadata filters across roles...</div>
+            </td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch('/api/security/test', { method: 'POST' });
+        const data = await response.json();
+
+        banner.style.display = 'block';
+        document.getElementById('scoreBadge').textContent = `${data.security_score}%`;
+        document.getElementById('passedCount').textContent = data.passed_tests;
+        document.getElementById('totalCount').textContent = data.total_tests;
+
+        if (data.security_score === 100) {
+            document.getElementById('scoreBadge').style.background = 'var(--mint)';
+            document.getElementById('scoreBadge').style.color = '#1C4532';
+            document.getElementById('scoreTitle').textContent = 'All Permission Isolation Tests PASSED';
+        } else {
+            document.getElementById('scoreBadge').style.background = 'var(--danger-bg)';
+            document.getElementById('scoreBadge').style.color = '#742A2A';
+            document.getElementById('scoreTitle').textContent = 'Security Policy Warning Detected';
+        }
+
+        tbody.innerHTML = data.results.map(r => `
+            <tr>
+                <td>
+                    <div style="font-weight: 600; font-size: 0.9rem;">${r.name}</div>
+                    <div style="font-size: 0.75rem; color: var(--muted-color); max-width: 260px;">${r.answer_snippet}</div>
+                </td>
+                <td>
+                    <span class="badge" style="background: var(--lavender); color: var(--text-color);">${r.user_role}</span>
+                    <div style="font-size: 0.75rem; color: var(--muted-color); margin-top: 2px;">${r.user_dept}</div>
+                </td>
+                <td style="font-size: 0.85rem; font-style: italic; max-width: 220px;">
+                    "${r.query}"
+                </td>
+                <td>
+                    <span class="badge ${r.expected === 'ALLOWED' ? 'badge-allowed' : 'badge-denied'}">${r.expected}</span>
+                </td>
+                <td>
+                    <span class="badge ${r.actual === 'ALLOWED' ? 'badge-allowed' : 'badge-denied'}">${r.actual}</span>
+                </td>
+                <td>
+                    ${r.passed ? 
+                        `<span class="badge badge-pass" style="font-size: 0.85rem; padding: 6px 12px;">✓ PASS</span>` : 
+                        `<span class="badge badge-denied" style="font-size: 0.85rem; padding: 6px 12px;">✕ FAIL</span>`
+                    }
+                </td>
+            </tr>
+        `).join('');
+
+    } catch(err) {
+        alert('Error running security test suite: ' + err);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '⚡ Re-Run Security Test Suite';
+    }
+}
+</script>
+{% endblock %}

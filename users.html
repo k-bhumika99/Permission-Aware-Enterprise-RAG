@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Users & Roles Management | Permission-Aware RAG{% endblock %}
+
+{% block header_title %}User Roles & Access Control (RBAC){% endblock %}
+
+{% block content %}
+
+<!-- Stats Cards -->
+<div class="grid-4" style="margin-bottom: 24px;">
+    <div class="stat-card">
+        <div class="stat-icon primary">👥</div>
+        <div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total Registered Users</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon mint">👨‍💻</div>
+        <div>
+            <div class="stat-value">{{ stats.employees }}</div>
+            <div class="stat-label">Employees</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon secondary">👨‍💼</div>
+        <div>
+            <div class="stat-value">{{ stats.managers }}</div>
+            <div class="stat-label">Managers</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon peach">👩‍💼</div>
+        <div>
+            <div class="stat-value">{{ stats.hr + stats.admins }}</div>
+            <div class="stat-label">HR & Admins</div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card" style="margin-bottom: 24px;">
+    <h3 style="font-size: 1.2rem; margin-bottom: 4px;">User Directory & Permission Roles</h3>
+    <p style="color: var(--muted-color); font-size: 0.85rem;">Modify role and department assignments to change pre-retrieval vector access boundaries.</p>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>User Details</th>
+                <th>Department</th>
+                <th>Current Role</th>
+                <th>Status</th>
+                <th>Registered Date</th>
+                {% if user.role == 'ADMIN' %}<th>Admin Actions</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar" style="width: 32px; height: 32px; font-size: 0.85rem;">{{ u.name[0] }}</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">{{ u.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted-color);">{{ u.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge" style="background: var(--lavender); color: var(--text-color);">{{ u.department }}</span>
+                </td>
+                <td>
+                    <span class="badge badge-internal">{{ u.role }}</span>
+                </td>
+                <td>
+                    {% if u.is_active %}
+                    <span class="badge badge-pass">ACTIVE</span>
+                    {% else %}
+                    <span class="badge badge-denied">INACTIVE</span>
+                    {% endif %}
+                </td>
+                <td style="font-size: 0.8rem; color: var(--muted-color);">
+                    {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else 'Seed Data' }}
+                </td>
+                {% if user.role == 'ADMIN' %}
+                <td>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openEditUserModal('{{ u.id }}', '{{ u.name }}', '{{ u.role }}', '{{ u.department }}', {{ 'true' if u.is_active else 'false' }})">
+                        ⚙️ Edit Role/Dept
+                    </button>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Admin Edit User Modal -->
+<div id="editUserModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center;">
+    <div class="glass-card" style="width: 100%; max-width: 480px; padding: 28px;">
+        <h3 id="editUserModalTitle" style="margin-bottom: 16px;">Modify User Permissions</h3>
+        
+        <form id="editUserForm" onsubmit="saveUserChanges(event)">
+            <input type="hidden" id="editUserId">
+            
+            <div class="form-group">
+                <label class="form-label">Employee Role</label>
+                <select id="editRole" class="form-control">
+                    <option value="EMPLOYEE">EMPLOYEE</option>
+                    <option value="MANAGER">MANAGER</option>
+                    <option value="HR">HR</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Department</label>
+                <select id="editDepartment" class="form-control">
+                    <option value="Engineering">Engineering</option>
+                    <option value="Finance">Finance</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Operations">Operations</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Account Status</label>
+                <select id="editStatus" class="form-control">
+                    <option value="true">ACTIVE</option>
+                    <option value="false">INACTIVE</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditUserModal(id, name, role, dept, isActive) {
+    document.getElementById('editUserId').value = id;
+    document.getElementById('editRole').value = role;
+    document.getElementById('editDepartment').value = dept;
+    document.getElementById('editStatus').value = isActive ? 'true' : 'false';
+    document.getElementById('editUserModalTitle').textContent = `Modify Permissions: ${name}`;
+    document.getElementById('editUserModal').style.display = 'flex';
+}
+
+function closeEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+}
+
+async function saveUserChanges(event) {
+    event.preventDefault();
+    const id = document.getElementById('editUserId').value;
+    const role = document.getElementById('editRole').value;
+    const department = document.getElementById('editDepartment').value;
+    const is_active = document.getElementById('editStatus').value === 'true';
+
+    try {
+        const resp = await fetch(`/api/users/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role, department, is_active })
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to update user');
+        }
+    } catch(err) {
+        alert('Error: ' + err);
+    }
+}
+</script>
+{% endblock %}

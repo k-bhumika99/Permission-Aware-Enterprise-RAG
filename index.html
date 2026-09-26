@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Permission-Aware Enterprise RAG | Secure AI Knowledge Engine{% endblock %}
+
+{% block public_content %}
+<div id="home" style="min-height: 100vh; background: linear-gradient(135deg, #F5F8FF 0%, #EBF0FE 50%, #E3E9FA 100%); font-family: 'Inter', sans-serif;">
+
+    <!-- Top Navigation Header (Sticky Header) -->
+    <header class="public-header" style="position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); background: rgba(245, 248, 255, 0.92); border-bottom: 1px solid rgba(226, 232, 240, 0.6);">
+        <div class="brand-header-logo">
+            <img src="{{ url_for('static', filename='images/shield_logo.svg') }}" alt="Logo" style="width: 38px; height: 38px;">
+            <span>Permission-Aware Enterprise RAG</span>
+        </div>
+        <ul class="public-nav-links">
+            <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#documents">Documents</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div style="display: flex; gap: 14px; align-items: center;">
+            <a href="{{ url_for('auth_bp.signin_view') }}" class="pill-btn pill-btn-outline" style="padding: 10px 24px;">Sign In</a>
+            <a href="{{ url_for('auth_bp.signup_view') }}" class="pill-btn pill-btn-primary" style="padding: 10px 24px;">Sign Up</a>
+        </div>
+    </header>
+
+    <!-- 1. HERO SECTION (#home) -->
+    <div style="max-width: 1340px; margin: 20px auto 60px auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 40px; min-height: 520px;">
+        
+        <!-- Left Hero Content -->
+        <div style="flex: 1; max-width: 520px; flex-shrink: 0;">
+            <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: #7C8BA1; margin-bottom: 16px; text-transform: uppercase;">
+                SECURE &nbsp;·&nbsp; CONTROLLED &nbsp;·&nbsp; TRUSTED
+            </div>
+            
+            <h1 style="font-size: 3.4rem; font-weight: 800; line-height: 1.15; color: #1E293B; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">
+                Your Enterprise<br>
+                <span class="gradient-text">Knowledge,</span><br>
+                <span class="gradient-text">Safely Accessible</span>
+            </h1>
+
+            <p style="font-size: 1.08rem; color: #64748B; line-height: 1.6; margin-bottom: 32px; max-width: 480px;">
+                A permission-aware RAG system for your enterprise documents. Get accurate answers from authorized sources with citations and complete audit logs.
+            </p>
+
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 40px;">
+                <a href="{{ url_for('auth_bp.signup_view') }}" class="pill-btn pill-btn-primary">
+                    Get Started &rarr;
+                </a>
+                <a href="#about" class="pill-btn pill-btn-outline">
+                    Learn More
+                </a>
+            </div>
+
+            <!-- 4 Feature Pills -->
+            <div class="feature-pill-grid">
+                <div class="feature-pill-item">
+                    <div class="feature-icon-circle purple">🛡️</div>
+                    <span class="feature-pill-title">Role-Based<br>Access</span>
+                </div>
+                <div class="feature-pill-item">
+                    <div class="feature-icon-circle blue">📄</div>
+                    <span class="feature-pill-title">Secure<br>Document Index</span>
+                </div>
+                <div class="feature-pill-item">
+                    <div class="feature-icon-circle teal">🔍</div>
+                    <span class="feature-pill-title">Permission-Aware<br>Retrieval</span>
+                </div>
+                <div class="feature-pill-item">
+                    <div class="feature-icon-circle violet">📊</div>
+                    <span class="feature-pill-title">Audit Logs<br>&amp; Citations</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Hero 3D Graphic Illustration (FULL SIZE DISPLAY) -->
+        <div style="flex: 1.5; display: flex; justify-content: flex-end; align-items: center; width: 100%;">
+            <div style="position: relative; width: 100%;">
+                <img src="{{ url_for('static', filename='images/home_hero_graphic.png') }}" alt="Permission-Aware Enterprise RAG 3D Hero Illustration" style="width: 100%; height: auto; object-fit: contain; display: block; filter: drop-shadow(0 15px 32px rgba(91, 134, 255, 0.18));">
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ABOUT SECTION (#about) -->
+    <section id="about" style="max-width: 1240px; margin: 0 auto 80px auto; padding: 60px 24px 0 24px; scroll-margin-top: 80px;">
+        <div style="text-align: center; max-width: 760px; margin: 0 auto 50px auto;">
+            <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: #6366F1; margin-bottom: 12px; text-transform: uppercase;">
+                ABOUT THE ENGINE
+            </div>
+            <h2 style="font-size: 2.5rem; font-weight: 800; color: #1E293B; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">
+                Why Pre-Retrieval Permission Filtering Matters
+            </h2>
+            <p style="font-size: 1.1rem; color: #64748B; line-height: 1.7;">
+                Standard RAG pipelines retrieve document chunks based purely on vector similarity. In an enterprise, this leads to severe data leakage — employees receiving AI answers generated from restricted HR salaries or internal engineering keys. Our engine filters vector access <strong>BEFORE</strong> context reaches the LLM.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;">
+            <div class="glass-card" style="padding: 32px; background: rgba(255,255,255,0.9); border-radius: 20px;">
+                <div style="font-size: 2rem; margin-bottom: 16px;">🔐</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Zero Context Leakage</h3>
+                <p style="color: #64748B; font-size: 0.95rem; line-height: 1.6;">Unauthorized document vectors are omitted prior to similarity search. Restricted information never enters the prompt buffer.</p>
+            </div>
+            <div class="glass-card" style="padding: 32px; background: rgba(255,255,255,0.9); border-radius: 20px;">
+                <div style="font-size: 2rem; margin-bottom: 16px;">🏢</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Department Isolation</h3>
+                <p style="color: #64748B; font-size: 0.95rem; line-height: 1.6;">Documents are tagged by HR, Engineering, Marketing, and Finance. Users query only what their department clearance permits.</p>
+            </div>
+            <div class="glass-card" style="padding: 32px; background: rgba(255,255,255,0.9); border-radius: 20px;">
+                <div style="font-size: 2rem; margin-bottom: 16px;">📜</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Verifiable Citations</h3>
+                <p style="color: #64748B; font-size: 0.95rem; line-height: 1.6;">Every generated response includes explicit document source citations, chunk IDs, and confidence scores for compliance auditing.</p>
+            </div>
+        </div>
+
+        <!-- Security Flow Visualization -->
+        <div class="glass-card" style="padding: 36px; background: rgba(255,255,255,0.95); border-radius: 24px;">
+            <h3 style="text-align: center; margin-bottom: 8px; font-size: 1.35rem; font-weight: 700; color: #1E293B;">Enforced Security Architecture</h3>
+            <p style="text-align: center; color: #64748B; margin-bottom: 32px; font-size: 0.95rem;">Pre-Retrieval Permission Vector Engine Workflow</p>
+
+            <div class="security-flow-container">
+                <div class="flow-step active">
+                    <span style="font-size: 22px;">👤</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px;">User Query</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step active">
+                    <span style="font-size: 22px;">🔐</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px;">Authentication</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step active" style="border-color: #6FA8FF; background: #E9E2FF;">
+                    <span style="font-size: 22px;">⚡</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px; color: #434190;">Permission Engine</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step active">
+                    <span style="font-size: 22px;">🔍</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px;">Secure Retrieval</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step active">
+                    <span style="font-size: 22px;">📄</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px;">Authorized Context</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step active">
+                    <span style="font-size: 22px;">🧠</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px;">LLM Synthesis</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step active">
+                    <span style="font-size: 22px;">✅</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; margin-top: 4px;">Cited Answer</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. FEATURES SECTION (#features) -->
+    <section id="features" style="max-width: 1240px; margin: 0 auto 80px auto; padding: 60px 24px 0 24px; scroll-margin-top: 80px;">
+        <div style="text-align: center; max-width: 720px; margin: 0 auto 50px auto;">
+            <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: #6366F1; margin-bottom: 12px; text-transform: uppercase;">
+                CORE CAPABILITIES
+            </div>
+            <h2 style="font-size: 2.5rem; font-weight: 800; color: #1E293B; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">
+                Built for Enterprise Compliance &amp; Speed
+            </h2>
+            <p style="font-size: 1.05rem; color: #64748B; line-height: 1.6;">
+                Everything you need to deploy enterprise AI knowledge retrieval while remaining fully compliant with corporate data governance policies.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px;">
+            <div class="glass-card" style="padding: 32px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="width: 48px; height: 48px; background: #EEF2FF; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px;">🛡️</div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Role-Based Access Control (RBAC)</h3>
+                <p style="color: #64748B; font-size: 0.92rem; line-height: 1.6;">Granular control across Admin, Manager, Employee, and Guest levels to ensure strict data scoping.</p>
+            </div>
+
+            <div class="glass-card" style="padding: 32px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="width: 48px; height: 48px; background: #E0F2FE; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px;">⚡</div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Real-Time Permission Vector Store</h3>
+                <p style="color: #64748B; font-size: 0.92rem; line-height: 1.6;">Updates to user roles or document permissions propagate instantly to vector embeddings index.</p>
+            </div>
+
+            <div class="glass-card" style="padding: 32px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="width: 48px; height: 48px; background: #E6FFFA; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px;">📑</div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Immutable Audit Logs</h3>
+                <p style="color: #64748B; font-size: 0.92rem; line-height: 1.6;">Comprehensive logging of user queries, accessed documents, timestamp, and permission check results.</p>
+            </div>
+
+            <div class="glass-card" style="padding: 32px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="width: 48px; height: 48px; background: #F3E8FF; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px;">📤</div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Multi-Format Document Ingestion</h3>
+                <p style="color: #64748B; font-size: 0.92rem; line-height: 1.6;">Upload PDF, DOCX, TXT, and Markdown files with custom clearance levels and department assignments.</p>
+            </div>
+
+            <div class="glass-card" style="padding: 32px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="width: 48px; height: 48px; background: #FEF3C7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px;">🤖</div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Interactive RAG AI Assistant</h3>
+                <p style="color: #64748B; font-size: 0.92rem; line-height: 1.6;">Natural conversational interface equipped with citation popups and source verification drawers.</p>
+            </div>
+
+            <div class="glass-card" style="padding: 32px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="width: 48px; height: 48px; background: #FEE2E2; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px;">🔍</div>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Security Sandbox &amp; Simulation</h3>
+                <p style="color: #64748B; font-size: 0.92rem; line-height: 1.6;">Simulate access attempts across different employee accounts to verify security rules before deployment.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. DOCUMENTS SECTION (#documents) -->
+    <section id="documents" style="max-width: 1240px; margin: 0 auto 80px auto; padding: 60px 24px 0 24px; scroll-margin-top: 80px;">
+        <div style="text-align: center; max-width: 720px; margin: 0 auto 50px auto;">
+            <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: #6366F1; margin-bottom: 12px; text-transform: uppercase;">
+                DOCUMENT SCOPING
+            </div>
+            <h2 style="font-size: 2.5rem; font-weight: 800; color: #1E293B; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">
+                Enterprise Security Access Matrix
+            </h2>
+            <p style="font-size: 1.05rem; color: #64748B; line-height: 1.6;">
+                How documents are classified and securely filtered by department clearance across the organization.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+            <div class="glass-card" style="padding: 28px; background: rgba(255,255,255,0.9); border-radius: 20px; border-top: 5px solid #8B5CF6;">
+                <div style="font-weight: 700; font-size: 1.15rem; color: #1E293B; margin-bottom: 8px;">📘 Human Resources (HR)</div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: #8B5CF6; margin-bottom: 16px;">RESTRICTED · HR DEPT ONLY</div>
+                <ul style="color: #64748B; font-size: 0.9rem; line-height: 1.8; padding-left: 20px; margin: 0;">
+                    <li>Employee Compensation Plans</li>
+                    <li>Performance Appraisal Reports</li>
+                    <li>Internal Hiring Guidelines</li>
+                </ul>
+            </div>
+
+            <div class="glass-card" style="padding: 28px; background: rgba(255,255,255,0.9); border-radius: 20px; border-top: 5px solid #0284C7;">
+                <div style="font-weight: 700; font-size: 1.15rem; color: #1E293B; margin-bottom: 8px;">📗 Engineering</div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: #0284C7; margin-bottom: 16px;">CONFIDENTIAL · ENG DEPT ONLY</div>
+                <ul style="color: #64748B; font-size: 0.9rem; line-height: 1.8; padding-left: 20px; margin: 0;">
+                    <li>System Architecture Specs</li>
+                    <li>API Infrastructure Keys</li>
+                    <li>Database Schema Manuals</li>
+                </ul>
+            </div>
+
+            <div class="glass-card" style="padding: 28px; background: rgba(255,255,255,0.9); border-radius: 20px; border-top: 5px solid #0D9488;">
+                <div style="font-weight: 700; font-size: 1.15rem; color: #1E293B; margin-bottom: 8px;">📙 Marketing</div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: #0D9488; margin-bottom: 16px;">INTERNAL · ALL EMPLOYEES</div>
+                <ul style="color: #64748B; font-size: 0.9rem; line-height: 1.8; padding-left: 20px; margin: 0;">
+                    <li>Brand Style &amp; Assets Guide</li>
+                    <li>Product Launch Timelines</li>
+                    <li>Public Copywriting Guidelines</li>
+                </ul>
+            </div>
+
+            <div class="glass-card" style="padding: 28px; background: rgba(255,255,255,0.9); border-radius: 20px; border-top: 5px solid #E11D48;">
+                <div style="font-weight: 700; font-size: 1.15rem; color: #1E293B; margin-bottom: 8px;">📕 Finance</div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: #E11D48; margin-bottom: 16px;">STRICT CONFIDENTIAL · EXECUTIVES</div>
+                <ul style="color: #64748B; font-size: 0.9rem; line-height: 1.8; padding-left: 20px; margin: 0;">
+                    <li>Quarterly Audit Filings</li>
+                    <li>Investor Deck Briefings</li>
+                    <li>Tax &amp; Revenue Operations</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. CONTACT SECTION (#contact) -->
+    <section id="contact" style="max-width: 1240px; margin: 0 auto 80px auto; padding: 60px 24px 0 24px; scroll-margin-top: 80px;">
+        <div class="glass-card" style="padding: 48px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 10px 40px rgba(91, 134, 255, 0.08); display: flex; flex-wrap: wrap; gap: 40px; align-items: center;">
+            <div style="flex: 1; min-width: 300px;">
+                <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: #6366F1; margin-bottom: 12px; text-transform: uppercase;">
+                    ENTERPRISE SUPPORT
+                </div>
+                <h2 style="font-size: 2.2rem; font-weight: 800; color: #1E293B; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">
+                    Get in Touch with Our Security Team
+                </h2>
+                <p style="color: #64748B; line-height: 1.6; margin-bottom: 24px;">
+                    Have questions about deploying Permission-Aware RAG in your VPC or on-premise infrastructure? Our enterprise security architects are ready to assist.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; align-items: center; gap: 12px; color: #374151; font-weight: 600;">
+                        <span style="font-size: 20px;">📧</span> security@enterprise-rag.internal
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; color: #374151; font-weight: 600;">
+                        <span style="font-size: 20px;">⏱️</span> Average SLA Response Time: &lt; 2 Hours
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; color: #374151; font-weight: 600;">
+                        <span style="font-size: 20px;">🛡️</span> SOC2 Type II &amp; HIPAA Compliant Architecture
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex: 1; min-width: 300px; background: #F8FAFC; padding: 32px; border-radius: 20px; border: 1px solid #E2E8F0;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1E293B; margin-bottom: 20px;">Send an Inquiry</h3>
+                <form onsubmit="event.preventDefault(); alert('Thank you! Your security inquiry has been submitted successfully.');">
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">Work Email</label>
+                        <input type="email" required placeholder="name@company.com" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">Department / Organization</label>
+                        <input type="text" required placeholder="Security Operations / Engineering" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 6px;">Message</label>
+                        <textarea rows="3" required placeholder="Tell us about your security requirements..." style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 0.9rem; font-family: inherit;"></textarea>
+                    </div>
+                    <button type="submit" class="pill-btn pill-btn-primary" style="width: 100%;">
+                        Submit Security Inquiry &rarr;
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="color: var(--muted-color); font-size: 0.9rem; text-align: center; padding-bottom: 40px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 24px;">
+        Enterprise Permission-Aware RAG Engine &copy; 2026. Zero-Trust Security Architecture.
+    </footer>
+</div>
+
+<!-- Active Navigation Highlight Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.public-nav-links a');
+    const sections = document.querySelectorAll('section, div#home');
+
+    window.addEventListener('scroll', () => {
+        let current = 'home';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 120;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

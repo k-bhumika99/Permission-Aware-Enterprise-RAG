@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Upload & Index Document | Permission-Aware RAG{% endblock %}
+
+{% block header_title %}Secure Document Upload & Indexing{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 750px; margin: 0 auto; padding: 36px;">
+
+    <div style="margin-bottom: 24px; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 6px;">Upload Enterprise Document</h2>
+        <p style="color: var(--muted-color); font-size: 0.9rem;">
+            When indexed, text chunks will be automatically generated with strict <strong>permission metadata</strong> attached to each chunk in the vector index.
+        </p>
+    </div>
+
+    <form action="{{ url_for('documents_bp.upload_view') }}" method="POST" enctype="multipart/form-data">
+
+        <div class="form-group">
+            <label class="form-label" for="title">Document Title</label>
+            <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Q3 Financial Performance & Salary Structure" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="file">Select File (PDF, TXT, DOCX, MD)</label>
+            <input type="file" id="file" name="file" class="form-control" accept=".pdf,.txt,.docx,.md" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label class="form-label" for="department">Target Department</label>
+                <select id="department" name="department" class="form-control">
+                    <option value="Engineering">Engineering</option>
+                    <option value="Finance">Finance</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Operations">Operations</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="classification">Security Classification</label>
+                <select id="classification" name="classification" class="form-control">
+                    <option value="PUBLIC">PUBLIC (All Users)</option>
+                    <option value="INTERNAL" selected>INTERNAL (Department / Employees)</option>
+                    <option value="CONFIDENTIAL">CONFIDENTIAL (Managers / HR)</option>
+                    <option value="RESTRICTED">RESTRICTED (HR & Admins Only)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Role Access Selection Matrix -->
+        <div class="form-group" style="background: rgba(233,226,255,0.4); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+            <label class="form-label" style="margin-bottom: 12px; font-weight: 600;">Allowed Roles (Metadata Filter Criteria)</label>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
+                    <input type="checkbox" name="allowed_roles" value="EMPLOYEE" checked> Employee
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
+                    <input type="checkbox" name="allowed_roles" value="MANAGER" checked> Manager
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
+                    <input type="checkbox" name="allowed_roles" value="HR" checked> HR
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
+                    <input type="checkbox" name="allowed_roles" value="ADMIN" checked disabled> Admin (Always Allowed)
+                </label>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label class="form-label" for="allowed_departments">Department Access Scope</label>
+                <select id="allowed_departments" name="allowed_departments" class="form-control">
+                    <option value="ALL" selected>ALL Departments</option>
+                    <option value="Engineering">Engineering Only</option>
+                    <option value="Finance">Finance Only</option>
+                    <option value="HR">HR Only</option>
+                    <option value="Marketing">Marketing Only</option>
+                    <option value="Operations">Operations Only</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="sensitivity">Sensitivity Level</label>
+                <select id="sensitivity" name="sensitivity" class="form-control">
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM" selected>MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="TOP_SECRET">TOP_SECRET</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+                ⚡ Process, Chunk & Index into Vector Store
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Permission-Aware Enterprise RAG</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">🛡️</div>
+                <div class="brand-title">Enterprise RAG</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="/dashboard">📊 Dashboard</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/rag">🤖 AI Assistant</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/documents">📁 Documents</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/upload">📤 Upload Doc</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/permissions">🔑 Permissions</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/users">👥 Users & Roles</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/audit">📑 Audit Logs</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/security">🛡️ Security Testing</a>
+                </li>
+                <li class="nav-item ">
+                    <a href="/settings">⚙️ Settings</a>
+                </li>
+            </ul>
+
+            <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+                <a href="/logout" class="btn btn-secondary" style="width: 100%;">🚪 Sign Out</a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-header">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-color);">Enterprise Overview Dashboard</h3>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <a href="/profile" class="user-profile-badge">
+                        <div class="avatar">S</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">Senior Software Engineer</div>
+                            <div style="font-size: 0.75rem; color: var(--muted-color);">EMPLOYEE (Engineering)</div>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <main class="content-body">
+                
+                    
+                
+
+                
+
+<!-- 1. GREETING CARD -->
+<div class="glass-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(233, 226, 255, 0.95), rgba(191, 235, 221, 0.85)); border: 1px solid var(--glass-border); padding: 32px; box-shadow: var(--shadow-3d);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="font-size: 1.8rem;">👋</span>
+                <h1 style="font-size: 1.8rem; margin: 0; background: linear-gradient(135deg, #24324A, #6FA8FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Welcome back, Senior Software Engineer!
+                </h1>
+            </div>
+            <p style="color: var(--text-color); opacity: 0.85; font-size: 1rem; margin-bottom: 12px; max-width: 650px; line-height: 1.5;">
+                You are authenticated with <strong>EMPLOYEE</strong> privileges within the <strong>Engineering</strong> department scope. 
+                Pre-retrieval permission filters are actively enforcing zero-trust isolation on every query.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="badge badge-pass" style="padding: 6px 14px; font-size: 0.8rem;">🛡️ ROLE: EMPLOYEE</span>
+                <span class="badge badge-internal" style="padding: 6px 14px; font-size: 0.8rem;">🏢 DEPT: Engineering</span>
+                <span class="badge" style="background: #ffffff; color: var(--text-color); padding: 6px 14px; font-size: 0.8rem;">⚡ SECURITY SCORE: 100%</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="/rag" class="btn btn-primary" style="padding: 12px 20px; font-size: 0.95rem;">
+                🤖 AI Assistant
+            </a>
+            <a href="/upload" class="btn btn-secondary" style="padding: 12px 20px; font-size: 0.95rem;">
+                📤 Upload Doc
+            </a>
+            <a href="/security" class="btn" style="background: var(--mint); color: #1C4532; padding: 12px 20px; font-size: 0.95rem;">
+                🛡️ Security Suite
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 2. TOP METRICS STAT CARDS GRID -->
+<div class="grid-4" style="margin-bottom: 28px;">
+    <div class="stat-card">
+        <div class="stat-icon primary">📁</div>
+        <div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Total Indexed Documents</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon mint">🔓</div>
+        <div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Authorized to Senior</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon peach">🔒</div>
+        <div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Restricted Documents</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon secondary">💬</div>
+        <div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Queries Executed Today</div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Stats Bar -->
+<div class="grid-4" style="margin-bottom: 28px;">
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">👥 Registered Users: <span style="color: var(--primary); font-weight: 700;">1</span></div>
+    </div>
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">🛑 Permission Denials: <span style="color: var(--danger-color); font-weight: 700;">0</span></div>
+    </div>
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">🛡️ Security Events: <span style="color: #6B46C1; font-weight: 700;">0</span></div>
+    </div>
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">✅ Successful RAG Queries: <span style="color: var(--success-color); font-weight: 700;">0</span></div>
+    </div>
+</div>
+
+<!-- 3. VISUAL CHARTS SECTION -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+
+    <!-- Chart 1: Document Classification Breakdown -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <h3 style="font-size: 1.15rem;">Document Classification Breakdown</h3>
+            <span class="badge badge-internal">SECURITY SCOPE</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+                    <span>🟢 PUBLIC (Accessible to All Users)</span>
+                    <span>1 Documents</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(233,226,255,0.5); border-radius: 6px; overflow: hidden;">
+                    <div style="width: 20%; height: 100%; background: var(--mint);"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+                    <span>🔵 INTERNAL (Department / Employee Scope)</span>
+                    <span>2 Documents</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(233,226,255,0.5); border-radius: 6px; overflow: hidden;">
+                    <div style="width: 40%; height: 100%; background: var(--primary);"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+                    <span>🟡 CONFIDENTIAL (Manager & HR Scope)</span>
+                    <span>1 Documents</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(233,226,255,0.5); border-radius: 6px; overflow: hidden;">
+                    <div style="width: 20%; height: 100%; background: var(--warning-bg);"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+                    <span>🔴 RESTRICTED (HR & Admin Only)</span>
+                    <span>1 Documents</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(233,226,255,0.5); border-radius: 6px; overflow: hidden;">
+                    <div style="width: 20%; height: 100%; background: var(--danger-bg);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Security & Authorization Ratio -->
+    <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 1.15rem;">Authorization Compliance Ratio</h3>
+            <span class="badge badge-pass">HEALTH: 100%</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-around; padding: 16px 0;">
+            <!-- Visual Circular Meter -->
+            <div style="width: 130px; height: 130px; border-radius: 50%; background: conic-gradient(var(--mint) 0% 100%, var(--danger-bg) 100% 100%); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);">
+                <div style="width: 96px; height: 96px; border-radius: 50%; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.5rem; font-weight: 700; color: var(--text-color);">100%</span>
+                    <span style="font-size: 0.65rem; color: var(--muted-color); font-weight: 600;">PASS RATE</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 14px; height: 14px; background: var(--mint); border-radius: 4px;"></div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1rem;">0 Queries</div>
+                        <div style="font-size: 0.8rem; color: var(--muted-color);">Authorized & Retrieved</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 14px; height: 14px; background: var(--danger-bg); border-radius: 4px;"></div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1rem;">0 Requests</div>
+                        <div style="font-size: 0.8rem; color: var(--muted-color);">Blocked by Permission Engine</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(248,251,255,0.8); padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); font-size: 0.8rem; color: var(--muted-color); text-align: center;">
+            🔒 Zero unauthorized chunks have breached LLM context buffer.
+        </div>
+    </div>
+
+</div>
+
+<!-- 4. VISUAL SECURITY PIPELINE FLOW DIAGRAM -->
+<div class="glass-card" style="margin-bottom: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+            <h3 style="font-size: 1.2rem;">Live RAG Permission Security Architecture</h3>
+            <p style="color: var(--muted-color); font-size: 0.85rem; margin-top: 4px;">
+                Active execution pipeline for <strong>Senior Software Engineer</strong> (Role: <strong>EMPLOYEE</strong>, Dept: <strong>Engineering</strong>)
+            </p>
+        </div>
+        <span class="badge badge-pass">PRE-RETRIEVAL ENFORCED</span>
+    </div>
+
+    <div class="security-flow-container">
+        <div class="flow-step active">
+            <span style="font-size: 20px;">👤</span>
+            <span style="font-size: 0.8rem; font-weight: 600; margin-top: 4px;">USER QUERY</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">
+            <span style="font-size: 20px;">🔑</span>
+            <span style="font-size: 0.8rem; font-weight: 600; margin-top: 4px;">AUTHENTICATION</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">
+            <span style="font-size: 20px;">🎖️</span>
+            <span style="font-size: 0.8rem; font-weight: 600; margin-top: 4px;">ROLE CHECK</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active" style="background: var(--lavender); border-color: var(--primary);">
+            <span style="font-size: 20px;">⚡</span>
+            <span style="font-size: 0.8rem; font-weight: 600; margin-top: 4px; color: #434190;">PERMISSION ENGINE</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step active">
+            <span style="font-size: 20px;">🔍</span>
+            <span style="font-size: 0.8rem; font-weight: 600; margin-top: 4px;">METADATA FILTER</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        
+        <!-- Dual Split Path: Authorized vs Blocked -->
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.75rem; color: var(--success-color); font-weight: bold;">[PERMITTED] →</span>
+                <div class="flow-step active" style="padding: 6px 10px; background: var(--mint);">
+                    <span style="font-size: 0.75rem; font-weight: 600;">AUTHORIZED CONTEXT</span>
+                </div>
+                <span style="font-size: 0.75rem;">→</span>
+                <div class="flow-step active" style="padding: 6px 10px;">
+                    <span style="font-size: 0.75rem; font-weight: 600;">LLM → ANSWER</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.75rem; color: var(--danger-color); font-weight: bold;">[RESTRICTED] →</span>
+                <div class="flow-step blocked" style="padding: 6px 10px; background: var(--danger-bg);">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: #742A2A;">🛑 BLOCKED & EXCLUDED</span>
+                </div>
+                <span style="font-size: 0.75rem;">→</span>
+                <div class="flow-step blocked" style="padding: 6px 10px;">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: #742A2A;">NO LLM EXPOSURE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 5. TWO COLUMN ACTIVITY FEED -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+    <!-- Recent RAG Queries Table -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem;">Recent RAG Queries</h3>
+            <a href="/rag" style="font-size: 0.85rem; font-weight: 600;">Launch AI Assistant →</a>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Query</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--muted-color); padding: 24px;">No recent query records logged yet.</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Live Security Audit Stream -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem;">Live Security Audit Events</h3>
+            <a href="/audit" style="font-size: 0.85rem; font-weight: 600;">View All Logs →</a>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>User</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--muted-color); padding: 24px;">No security events recorded.</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+            </main>
+        </div>
+    </div>
+    
+
+</body>
+</html>

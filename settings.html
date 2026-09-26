@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings | Permission-Aware Enterprise RAG{% endblock %}
+
+{% block header_title %}System & Vector Security Settings{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 0 auto; padding: 36px;">
+    <h2 style="font-size: 1.4rem; margin-bottom: 6px;">Enterprise RAG Configuration</h2>
+    <p style="color: var(--muted-color); font-size: 0.9rem; margin-bottom: 24px; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px;">
+        Configure pre-retrieval permission filters, LLM providers, and vector store parameters.
+    </p>
+
+    <form action="{{ url_for('settings_bp.settings_view') }}" method="POST">
+        
+        <div class="form-group">
+            <label class="form-label">Database URL (PostgreSQL / SQLite)</label>
+            <input type="text" class="form-control" value="{{ settings.database_url }}" readonly style="background: rgba(233,226,255,0.4);">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="llm_provider">LLM Generation Engine</label>
+            <select id="llm_provider" name="llm_provider" class="form-control" {% if user.role != 'ADMIN' %}disabled{% endif %}>
+                <option value="auto" {% if settings.llm_provider=='auto' %}selected{% endif %}>Auto (Cloud API if Key provided, else Local Enterprise Synthesis)</option>
+                <option value="openai" {% if settings.llm_provider=='openai' %}selected{% endif %}>OpenAI GPT-4o-mini (Cloud)</option>
+                <option value="gemini" {% if settings.llm_provider=='gemini' %}selected{% endif %}>Google Gemini (Cloud)</option>
+                <option value="local" {% if settings.llm_provider=='local' %}selected{% endif %}>Local Offline Enterprise Synthesis Engine</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Vector Embedding Model</label>
+            <input type="text" class="form-control" value="{{ settings.embedding_model }}" readonly style="background: rgba(233,226,255,0.4);">
+        </div>
+
+        <div class="form-group" style="background: rgba(233,226,255,0.4); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); margin-bottom: 24px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600;">
+                <input type="checkbox" name="strict_mode" {% if settings.strict_mode %}checked{% endif %} {% if user.role != 'ADMIN' %}disabled{% endif %}>
+                Strict Pre-Retrieval Metadata Filter Enforcement
+            </label>
+            <p style="color: var(--muted-color); font-size: 0.8rem; margin-top: 6px; margin-left: 24px;">
+                When enabled, unauthorized chunks are strictly excluded before cosine similarity scoring occurs.
+            </p>
+        </div>
+
+        {% if user.role == 'ADMIN' %}
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+            💾 Save System Settings
+        </button>
+        {% else %}
+        <div style="color: var(--muted-color); font-size: 0.85rem; text-align: center;">
+            🔒 System settings modification requires ADMIN role permissions.
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

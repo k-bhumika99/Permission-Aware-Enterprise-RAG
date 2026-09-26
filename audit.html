@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs | Permission-Aware Enterprise RAG{% endblock %}
+
+{% block header_title %}Immutable Security Audit Log Stream{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h2 style="font-size: 1.4rem; margin-bottom: 4px;">Security Audit Compliance Log</h2>
+            <p style="color: var(--muted-color); font-size: 0.85rem;">Records every query, access attempt, authorization decision, and document action.</p>
+        </div>
+
+        <form action="{{ url_for('audit_bp.audit_view') }}" method="GET" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" name="q" class="form-control" placeholder="Search user or query..." value="{{ search_q or '' }}" style="width: 180px;">
+
+            <select name="role" class="form-control" style="width: 130px;">
+                <option value="">All Roles</option>
+                {% for r in roles %}
+                <option value="{{ r }}" {% if current_role==r %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="action" class="form-control" style="width: 150px;">
+                <option value="">All Actions</option>
+                {% for a in actions %}
+                <option value="{{ a }}" {% if current_action==a %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="status" class="form-control" style="width: 130px;">
+                <option value="">All Statuses</option>
+                {% for s in statuses %}
+                <option value="{{ s }}" {% if current_status==s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Filter</button>
+            <a href="{{ url_for('audit_bp.audit_view') }}" class="btn btn-secondary" style="padding: 8px 16px;">Reset</a>
+        </form>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp (UTC)</th>
+                <th>User Identity</th>
+                <th>Action</th>
+                <th>Query / Target</th>
+                <th>Auth Status</th>
+                <th>Event Summary</th>
+                <th>IP Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td style="font-size: 0.8rem; white-space: nowrap; color: var(--muted-color);">
+                    {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp else '' }}
+                </td>
+                <td>
+                    <div style="font-weight: 600; font-size: 0.85rem;">{{ log.user_name }}</div>
+                    <div style="font-size: 0.75rem; color: var(--muted-color);">Role: {{ log.role }}</div>
+                </td>
+                <td>
+                    <span class="badge badge-internal" style="font-size: 0.7rem;">{{ log.action }}</span>
+                </td>
+                <td>
+                    {% if log.query %}
+                    <div style="font-size: 0.85rem; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ log.query }}">
+                        {{ log.query }}
+                    </div>
+                    {% elif log.document_id %}
+                    <span style="font-size: 0.8rem;">Document #{{ log.document_id }}</span>
+                    {% else %}
+                    <span style="color: var(--muted-color); font-size: 0.8rem;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {% if log.authorization_status=='PASS' or log.authorization_status=='ALLOWED' %}badge-pass{% else %}badge-denied{% endif %}">
+                        {{ log.authorization_status }}
+                    </span>
+                </td>
+                <td style="font-size: 0.85rem; max-width: 260px;">
+                    {{ log.result_summary or '-' }}
+                </td>
+                <td style="font-size: 0.75rem; color: var(--muted-color); font-family: monospace;">
+                    {{ log.ip_address }}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center; color: var(--muted-color); padding: 32px;">No audit log records match the selected filters.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

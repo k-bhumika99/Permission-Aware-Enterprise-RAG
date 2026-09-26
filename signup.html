@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | Permission-Aware Enterprise RAG{% endblock %}
+
+{% block public_content %}
+<div class="auth-page-wrapper">
+
+    <!-- Top Navigation Header -->
+    <header class="public-header" style="padding: 10px 24px;">
+        <div class="brand-header-logo">
+            <img src="{{ url_for('static', filename='images/shield_logo.svg') }}" alt="Logo" style="width: 36px; height: 36px;">
+            <span>Permission-Aware Enterprise RAG</span>
+        </div>
+        <ul class="public-nav-links">
+            <li><a href="{{ url_for('index_view') }}">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Documents</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="{{ url_for('auth_bp.signin_view') }}" class="pill-btn pill-btn-outline" style="padding: 8px 20px; font-size: 0.88rem;">Sign In</a>
+            <a href="{{ url_for('auth_bp.signup_view') }}" class="pill-btn pill-btn-primary" style="padding: 8px 20px; font-size: 0.88rem;">Sign Up</a>
+        </div>
+    </header>
+
+    <!-- Split Card Container -->
+    <div class="auth-split-container">
+        
+        <!-- Left Side: 3D Workspace Illustration -->
+        <div class="auth-illustration-col">
+            <img src="{{ url_for('static', filename='images/signup_illustration.png') }}" alt="Sign Up Workspace Illustration" class="auth-illustration-img">
+        </div>
+
+        <!-- Right Side: Sign Up Form Card -->
+        <div class="auth-form-col">
+
+            <!-- Logo Header -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px;">
+                <img src="{{ url_for('static', filename='images/shield_logo.svg') }}" alt="Logo" style="width: 32px; height: 32px;">
+                <span style="font-weight: 700; font-size: 1.05rem; color: #1E293B;">Permission-Aware<br>Enterprise RAG</span>
+            </div>
+
+            <h2 style="font-size: 1.5rem; font-weight: 700; text-align: center; color: #1E293B; margin-bottom: 20px;">Create Your Account</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'success' %}
+                        <div style="padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem; background: var(--mint); color: #1C4532;">
+                        {% else %}
+                        <div style="padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem; background: var(--danger-bg); color: #742A2A;">
+                        {% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('auth_bp.signup_view') }}" method="POST">
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <div class="input-with-icon">
+                        <span class="input-icon-prefix">👤</span>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Full Name" value="{{ name or '' }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <div class="input-with-icon">
+                        <span class="input-icon-prefix">✉️</span>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Email Address" value="{{ email or '' }}" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div>
+                        <select id="department" name="department" class="form-control" style="background: #F9FAFB; border-radius: 12px; height: 44px; font-size: 0.88rem;">
+                            <option value="Engineering" {% if department=='Engineering' %}selected{% endif %}>Engineering</option>
+                            <option value="Finance" {% if department=='Finance' %}selected{% endif %}>Finance</option>
+                            <option value="HR" {% if department=='HR' %}selected{% endif %}>HR</option>
+                            <option value="Marketing" {% if department=='Marketing' %}selected{% endif %}>Marketing</option>
+                            <option value="Operations" {% if department=='Operations' %}selected{% endif %}>Operations</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="role" name="role" class="form-control" style="background: #F9FAFB; border-radius: 12px; height: 44px; font-size: 0.88rem;">
+                            <option value="EMPLOYEE" {% if role=='EMPLOYEE' %}selected{% endif %}>Employee</option>
+                            <option value="MANAGER" {% if role=='MANAGER' %}selected{% endif %}>Manager</option>
+                            <option value="HR" {% if role=='HR' %}selected{% endif %}>HR</option>
+                            <option value="ADMIN" {% if role=='ADMIN' %}selected{% endif %}>Admin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <div class="input-with-icon">
+                        <span class="input-icon-prefix">🔒</span>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <div class="input-with-icon">
+                        <span class="input-icon-prefix">🔒</span>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm Password" required>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="pill-btn pill-btn-primary" style="width: 100%; padding: 12px; font-size: 0.95rem; margin-bottom: 14px;">
+                    Sign Up
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="auth-divider" style="margin: 14px 0;">
+                <span>OR</span>
+            </div>
+
+            <!-- Google Sign Up Button -->
+            <button type="button" class="pill-btn pill-btn-google" style="margin-bottom: 16px;">
+                <img src="{{ url_for('static', filename='images/google_logo.svg') }}" alt="Google" style="width: 18px; height: 18px;">
+                Sign up with Google
+            </button>
+
+            <!-- Sign In Footer Link -->
+            <div style="text-align: center; font-size: 0.85rem; color: #64748B;">
+                Already have an account? <a href="{{ url_for('auth_bp.signin_view') }}" style="color: #6366F1; font-weight: 700;">Sign In</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="color: #94A3B8; font-size: 0.8rem; text-align: center; padding-bottom: 10px;">
+        Enterprise Permission-Aware RAG Engine &copy; 2026
+    </footer>
+</div>
+{% endblock %}

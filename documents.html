@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Document Management | Permission-Aware Enterprise RAG{% endblock %}
+
+{% block header_title %}Enterprise Knowledge Documents{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-size: 1.4rem;">Document Index & Permission Matrix</h2>
+            <p style="color: var(--muted-color); font-size: 0.85rem; margin-top: 4px;">
+                Showing documents. Accessible to <strong>{{ user.name }}</strong> ({{ user.role }}): <strong>{{ authorized_count }}</strong>
+            </p>
+        </div>
+        <a href="{{ url_for('documents_bp.upload_view') }}" class="btn btn-primary">
+            📤 Upload & Index Document
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Document Title</th>
+                <th>Department</th>
+                <th>Classification</th>
+                <th>Allowed Roles</th>
+                <th>Sensitivity</th>
+                <th>Chunks</th>
+                <th>Your Access</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in doc_data %}
+            {% set doc = item.doc %}
+            <tr>
+                <td>
+                    <div style="font-weight: 600; font-size: 0.95rem;">📄 {{ doc.title }}</div>
+                    <div style="font-size: 0.75rem; color: var(--muted-color);">File: {{ doc.filename }} | Owner: {{ doc.owner.name if doc.owner else 'System' }}</div>
+                </td>
+                <td>
+                    <span class="badge" style="background: var(--lavender); color: var(--text-color);">{{ doc.department }}</span>
+                </td>
+                <td>
+                    <span class="badge badge-{{ doc.classification.lower() }}">
+                        {{ doc.classification }}
+                    </span>
+                </td>
+                <td>
+                    <div style="font-size: 0.8rem; display: flex; gap: 4px; flex-wrap: wrap;">
+                        {% for r in doc.allowed_roles %}
+                        <span style="background: rgba(233, 226, 255, 0.6); padding: 2px 8px; border-radius: 4px; font-weight: 600;">{{ r }}</span>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    {% if doc.sensitivity == 'HIGH' or doc.sensitivity == 'TOP_SECRET' %}
+                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--danger-color);">
+                    {% else %}
+                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--muted-color);">
+                    {% endif %}
+                        {{ doc.sensitivity }}
+                    </span>
+                </td>
+                <td style="font-weight: 600;">
+                    {{ doc.chunk_count }}
+                </td>
+                <td>
+                    {% if item.can_access %}
+                    <span class="badge badge-pass">✓ AUTHORIZED</span>
+                    {% else %}
+                    <span class="badge badge-denied">🛑 RESTRICTED</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 8px;">
+                        {% if item.can_access %}
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="viewDocDetails('{{ doc.id }}')">View</button>
+                        {% else %}
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; opacity: 0.5;" disabled title="Restricted by Permission Engine">Blocked</button>
+                        {% endif %}
+
+                        {% if user.role == 'ADMIN' or doc.owner_id == user.id %}
+                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="deleteDoc('{{ doc.id }}', '{{ doc.title }}')">Delete</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--muted-color); padding: 32px;">No documents indexed in system. Click "Upload & Index Document" to start.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Viewing Document Details -->
+<div id="docModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center;">
+    <div class="glass-card" style="width: 100%; max-width: 600px; padding: 28px; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 id="modalTitle">Document Metadata</h3>
+            <button onclick="closeModal()" style="border: none; background: none; font-size: 20px; cursor: pointer;">✕</button>
+        </div>
+        <div id="modalBody" style="line-height: 1.6; font-size: 0.9rem;">
+            Loading document details...
+        </div>
+    </div>
+</div>
+
+<script>
+async function viewDocDetails(docId) {
+    const modal = document.getElementById('docModal');
+    const modalBody = document.getElementById('modalBody');
+    modal.style.display = 'flex';
+    modalBody.innerHTML = 'Loading metadata and indexed chunks...';
+
+    try {
+        const resp = await fetch(`/api/documents/${docId}`);
+        const data = await resp.json();
+        if (data.error) {
+            modalBody.innerHTML = `<div style="color: var(--danger-color);">Error: ${data.error}</div>`;
+            return;
+        }
+
+        const doc = data.document;
+        modalBody.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <strong>Title:</strong> ${doc.title}<br>
+                <strong>Department:</strong> ${doc.department}<br>
+                <strong>Classification:</strong> <span class="badge badge-${doc.classification.toLowerCase()}">${doc.classification}</span><br>
+                <strong>Allowed Roles:</strong> ${doc.allowed_roles.join(', ')}<br>
+                <strong>Chunks Indexed:</strong> ${doc.chunk_count}
+            </div>
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 16px 0;">
+            <h4 style="margin-bottom: 10px;">Permission Metadata Attached to Chunks:</h4>
+            <div style="background: rgba(248,251,255,0.8); padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; overflow-x: auto;">
+                ${JSON.stringify(data.chunks[0] || {}, null, 2)}
+            </div>
+        `;
+    } catch(err) {
+        modalBody.innerHTML = 'Error loading document: ' + err;
+    }
+}
+
+function closeModal() {
+    document.getElementById('docModal').style.display = 'none';
+}
+
+async function deleteDoc(docId, title) {
+    if (!confirm(`Are you sure you want to delete document '${title}' and its vector index entries?`)) return;
+
+    try {
+        const resp = await fetch(`/api/documents/${docId}/delete`, { method: 'POST' });
+        const data = await resp.json();
+        if (resp.ok) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to delete');
+        }
+    } catch(err) {
+        alert('Error: ' + err);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile | Permission-Aware RAG{% endblock %}
+
+{% block header_title %}User Account & Access Scope{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+
+    <!-- User Details Card -->
+    <div class="glass-card">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="avatar" style="width: 72px; height: 72px; font-size: 2rem; margin: 0 auto 16px auto;">
+                {{ user.name[0] }}
+            </div>
+            <h2 style="font-size: 1.4rem; margin-bottom: 4px;">{{ user.name }}</h2>
+            <div style="color: var(--muted-color); font-size: 0.9rem;">{{ user.email }}</div>
+            
+            <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px;">
+                <span class="badge badge-internal">{{ user.role }}</span>
+                <span class="badge" style="background: var(--mint); color: #1C4532;">{{ user.department }}</span>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+
+        <form action="{{ url_for('profile_bp.profile_view') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="name">Display Name</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ user.name }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Update Profile
+            </button>
+        </form>
+    </div>
+
+    <!-- Active Permission Boundaries & History -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="glass-card">
+            <h3 style="font-size: 1.2rem; margin-bottom: 12px;">Active Authorization Scope</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="background: rgba(248,251,255,0.8); padding: 14px; border-radius: 10px; border: 1px solid var(--glass-border);">
+                    <div style="font-size: 0.8rem; color: var(--muted-color);">Document Classifications Allowed</div>
+                    <div style="font-weight: 600; font-size: 0.95rem; margin-top: 4px;">
+                        PUBLIC, INTERNAL
+                        {% if user.role in ['HR', 'ADMIN', 'MANAGER'] %}, CONFIDENTIAL{% endif %}
+                        {% if user.role in ['HR', 'ADMIN'] %}, RESTRICTED{% endif %}
+                    </div>
+                </div>
+
+                <div style="background: rgba(248,251,255,0.8); padding: 14px; border-radius: 10px; border: 1px solid var(--glass-border);">
+                    <div style="font-size: 0.8rem; color: var(--muted-color);">Total Queries Executed</div>
+                    <div style="font-weight: 600; font-size: 1.2rem; color: var(--primary); margin-top: 4px;">
+                        {{ query_count }} Queries
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent User Activity -->
+        <div class="glass-card">
+            <h3 style="font-size: 1.2rem; margin-bottom: 16px;">Your Recent Activity</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for act in recent_activity %}
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600; font-size: 0.85rem;">{{ act.action }}</div>
+                                <div style="font-size: 0.75rem; color: var(--muted-color);">{{ act.result_summary or '' }}</div>
+                            </td>
+                            <td>
+                                <span class="badge {% if act.authorization_status=='PASS' or act.authorization_status=='ALLOWED' %}badge-pass{% else %}badge-denied{% endif %}">
+                                    {{ act.authorization_status }}
+                                </span>
+                            </td>
+                            <td style="font-size: 0.75rem; color: var(--muted-color);">
+                                {{ act.timestamp.strftime('%H:%M:%S') if act.timestamp else '' }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: var(--muted-color); padding: 20px;">No recent activity.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

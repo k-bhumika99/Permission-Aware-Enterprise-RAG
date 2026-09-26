@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Permission-Aware Enterprise RAG{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    {% if g.user %}
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">🛡️</div>
+                <div class="brand-title">Enterprise RAG</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item {% if request.endpoint == 'dashboard_bp.dashboard_view' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard_bp.dashboard_view') }}">📊 Dashboard</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'rag_bp.rag_view' %}active{% endif %}">
+                    <a href="{{ url_for('rag_bp.rag_view') }}">🤖 AI Assistant</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'documents_bp.documents_view' %}active{% endif %}">
+                    <a href="{{ url_for('documents_bp.documents_view') }}">📁 Documents</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'documents_bp.upload_view' %}active{% endif %}">
+                    <a href="{{ url_for('documents_bp.upload_view') }}">📤 Upload Doc</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'permissions_bp.permissions_view' %}active{% endif %}">
+                    <a href="{{ url_for('permissions_bp.permissions_view') }}">🔑 Permissions</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'users_bp.users_view' %}active{% endif %}">
+                    <a href="{{ url_for('users_bp.users_view') }}">👥 Users & Roles</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'audit_bp.audit_view' %}active{% endif %}">
+                    <a href="{{ url_for('audit_bp.audit_view') }}">📑 Audit Logs</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'security_bp.security_view' %}active{% endif %}">
+                    <a href="{{ url_for('security_bp.security_view') }}">🛡️ Security Testing</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'settings_bp.settings_view' %}active{% endif %}">
+                    <a href="{{ url_for('settings_bp.settings_view') }}">⚙️ Settings</a>
+                </li>
+            </ul>
+
+            <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+                <a href="{{ url_for('auth_bp.logout_view') }}" class="btn btn-secondary" style="width: 100%;">🚪 Sign Out</a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-header">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-color);">{% block header_title %}Permission-Aware Security Engine{% endblock %}</h3>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <a href="{{ url_for('profile_bp.profile_view') }}" class="user-profile-badge">
+                        <div class="avatar">{{ g.user.name[0] }}</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">{{ g.user.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted-color);">{{ g.user.role }} ({{ g.user.department }})</div>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <main class="content-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div style="margin-bottom: 20px;">
+                            {% for category, message in messages %}
+                                {% if category == 'success' %}
+                                <div class="glass-card" style="padding: 14px 20px; border-left: 5px solid var(--success-color); margin-bottom: 10px; background: rgba(255, 255, 255, 0.95);">
+                                {% else %}
+                                <div class="glass-card" style="padding: 14px 20px; border-left: 5px solid var(--danger-color); margin-bottom: 10px; background: rgba(255, 255, 255, 0.95);">
+                                {% endif %}
+                                    <strong>{% if category=='success' %}✓ Success{% else %}⚠️ Warning{% endif %}:</strong> {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}
+                {% if error %}
+                    <div class="glass-card" style="padding: 32px; border-left: 5px solid var(--danger-color);">
+                        <h2 style="color: var(--danger-color); margin-bottom: 12px;">⚠️ Server Request Error</h2>
+                        <p style="font-size: 1rem; color: var(--text-color);">{{ error }}</p>
+                        <a href="{{ url_for('dashboard_bp.dashboard_view') }}" class="btn btn-primary" style="margin-top: 16px;">Return to Dashboard</a>
+                    </div>
+                {% endif %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+        <!-- Unauthenticated Public View -->
+        {% block public_content %}{% endblock %}
+    {% endif %}
+
+</body>
+</html>

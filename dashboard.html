@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Permission-Aware Enterprise RAG{% endblock %}
+
+{% block header_title %}Enterprise Overview Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- 1. GREETING CARD -->
+<div class="glass-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(233, 226, 255, 0.95), rgba(191, 235, 221, 0.85)); border: 1px solid var(--glass-border); padding: 32px; box-shadow: var(--shadow-3d);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <span style="font-size: 2rem;">👋</span>
+                <h1 style="font-size: 1.8rem; margin: 0; background: linear-gradient(135deg, #24324A, #6FA8FF); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Good day, {{ user.name }}! Welcome to Enterprise Security Dashboard
+                </h1>
+            </div>
+            <p style="color: var(--text-color); opacity: 0.85; font-size: 1rem; margin-bottom: 12px; max-width: 680px; line-height: 1.5;">
+                Authenticated as <strong>{{ user.role }}</strong> in the <strong>{{ user.department }}</strong> department.
+                Pre-retrieval permission filters actively enforce zero-trust isolation on every query.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="badge badge-pass" style="padding: 6px 14px; font-size: 0.8rem;">🛡️ ROLE: {{ user.role }}</span>
+                <span class="badge badge-internal" style="padding: 6px 14px; font-size: 0.8rem;">🏢 DEPT: {{ user.department }}</span>
+                <span class="badge" style="background: #ffffff; color: var(--text-color); padding: 6px 14px; font-size: 0.8rem;">⚡ SECURITY SCORE: {{ sec_score }}%</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="{{ url_for('rag_bp.rag_view') }}" class="btn btn-primary" style="padding: 12px 20px; font-size: 0.95rem;">
+                🤖 AI Assistant
+            </a>
+            <a href="{{ url_for('documents_bp.upload_view') }}" class="btn btn-secondary" style="padding: 12px 20px; font-size: 0.95rem;">
+                📤 Upload Doc
+            </a>
+            <a href="{{ url_for('security_bp.security_view') }}" class="btn" style="background: var(--mint); color: #1C4532; padding: 12px 20px; font-size: 0.95rem;">
+                🛡️ Security Suite
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 2. TOP METRICS STAT CARDS GRID -->
+<div class="grid-4" style="margin-bottom: 28px;">
+    <div class="stat-card">
+        <div class="stat-icon primary">📁</div>
+        <div>
+            <div class="stat-value">{{ total_documents }}</div>
+            <div class="stat-label">Total Indexed Documents</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon mint">🔓</div>
+        <div>
+            <div class="stat-value">{{ authorized_documents_count }}</div>
+            <div class="stat-label">Authorized to {{ user.name.split()[0] }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon peach">🔒</div>
+        <div>
+            <div class="stat-value">{{ restricted_documents_count }}</div>
+            <div class="stat-label">Restricted Documents</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon secondary">💬</div>
+        <div>
+            <div class="stat-value">{{ queries_today }}</div>
+            <div class="stat-label">Queries Executed Today</div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Stats Bar -->
+<div class="grid-4" style="margin-bottom: 28px;">
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">👥 Registered Users: <span style="color: var(--primary); font-weight: 700;">{{ total_users }}</span></div>
+    </div>
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">🛑 Permission Denials: <span style="color: var(--danger-color); font-weight: 700;">{{ permission_denials }}</span></div>
+    </div>
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">🛡️ Security Events: <span style="color: #6B46C1; font-weight: 700;">{{ security_events }}</span></div>
+    </div>
+    <div class="stat-card" style="padding: 16px;">
+        <div style="font-weight: 600; font-size: 0.9rem;">✅ Successful RAG Queries: <span style="color: var(--success-color); font-weight: 700;">{{ successful_queries }}</span></div>
+    </div>
+</div>
+
+<!-- 3. INTERACTIVE VISUAL CHARTS GRID (Line, Bar, Doughnut Charts) -->
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 28px;">
+
+    <!-- Chart 1: Bar Chart (Classification Distribution) -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 1.1rem; margin: 0;">📊 Document Classification Bar Chart</h3>
+            <span class="badge badge-internal">SECURITY SCOPE</span>
+        </div>
+        <div style="height: 220px; position: relative;">
+            <canvas id="barClassificationChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: Pie / Doughnut Chart (Department Access Breakdown) -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 1.1rem; margin: 0;">🍩 Department Access Breakdown</h3>
+            <span class="badge badge-pass">ACTIVE SCOPE</span>
+        </div>
+        <div style="height: 220px; position: relative; display: flex; justify-content: center;">
+            <canvas id="pieDepartmentChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 3: Line Chart (Query & Security Audit Trends) -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 1.1rem; margin: 0;">📈 Query & Security Audit Line Chart</h3>
+            <span class="badge badge-allowed">LIVE TRENDS</span>
+        </div>
+        <div style="height: 220px; position: relative;">
+            <canvas id="lineTrendChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- 4. TWO COLUMN ACTIVITY FEED -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+    <!-- Recent RAG Queries Table -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem;">Recent RAG Queries</h3>
+            <a href="{{ url_for('rag_bp.rag_view') }}" style="font-size: 0.85rem; font-weight: 600;">Launch AI Assistant →</a>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Query</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in recent_queries %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600; font-size: 0.85rem;">{{ q.user_name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted-color);">{{ q.user_role }}</div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.85rem; max-width: 180px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ q.query_text }}</div>
+                        </td>
+                        <td>
+                            <span class="badge {% if q.authorization_status=='ALLOWED' %}badge-allowed{% else %}badge-denied{% endif %}">
+                                {{ q.authorization_status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('rag_bp.query_details_view', query_id=q.id) }}" style="font-size: 0.8rem; font-weight: 600;">Details</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--muted-color); padding: 24px;">No recent query records logged yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Live Security Audit Stream -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem;">Live Security Audit Events</h3>
+            <a href="{{ url_for('audit_bp.audit_view') }}" style="font-size: 0.85rem; font-weight: 600;">View All Logs →</a>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>User</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in recent_audit_events %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600; font-size: 0.85rem;">{{ log.action }}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted-color); max-width: 160px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ log.result_summary or '' }}</div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.85rem;">{{ log.user_name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted-color);">{{ log.role }}</div>
+                        </td>
+                        <td>
+                            <span class="badge {% if log.authorization_status=='PASS' or log.authorization_status=='ALLOWED' %}badge-pass{% else %}badge-denied{% endif %}">
+                                {{ log.authorization_status }}
+                            </span>
+                        </td>
+                        <td style="font-size: 0.75rem; color: var(--muted-color);">
+                            {{ log.timestamp.strftime('%H:%M:%S') if log.timestamp else '' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--muted-color); padding: 24px;">No security events recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div id="dashboard-chart-data" 
+     data-class-counts='{{ class_counts | tojson | safe }}'
+     data-successful-queries="{{ successful_queries | default(5) }}"
+     data-permission-denials="{{ permission_denials | default(0) }}"
+     style="display: none;"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const dataEl = document.getElementById("dashboard-chart-data");
+    const classCounts = dataEl ? JSON.parse(dataEl.dataset.classCounts || '{}') : {};
+    const successfulQueries = dataEl ? Number(dataEl.dataset.successfulQueries) || 0 : 5;
+    const permissionDenials = dataEl ? Number(dataEl.dataset.permissionDenials) || 0 : 0;
+
+    // Chart 1: Bar Chart (Classification Distribution)
+    const ctxBar = document.getElementById('barClassificationChart');
+    if (ctxBar) {
+        new Chart(ctxBar.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['PUBLIC', 'INTERNAL', 'CONFIDENTIAL', 'RESTRICTED'],
+                datasets: [{
+                    label: 'Document Count',
+                    data: [
+                        classCounts.PUBLIC || 0,
+                        classCounts.INTERNAL || 0,
+                        classCounts.CONFIDENTIAL || 0,
+                        classCounts.RESTRICTED || 0
+                    ],
+                    backgroundColor: ['#9ADBC5', '#6FA8FF', '#FFD99A', '#F5A6A6'],
+                    borderColor: ['#38A169', '#5A95F0', '#D69E2E', '#E53E3E'],
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    }
+
+    // Chart 2: Pie / Doughnut Chart (Department Access)
+    const ctxPie = document.getElementById('pieDepartmentChart');
+    if (ctxPie) {
+        new Chart(ctxPie.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Engineering', 'HR', 'Marketing', 'Operations'],
+                datasets: [{
+                    data: [40, 25, 20, 15],
+                    backgroundColor: ['#6FA8FF', '#B8A9FF', '#FFD6C9', '#BFEBDD'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+            }
+        });
+    }
+
+    // Chart 3: Line Chart (RAG Query & Audit Trends)
+    const ctxLine = document.getElementById('lineTrendChart');
+    if (ctxLine) {
+        new Chart(ctxLine.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
+                datasets: [
+                    {
+                        label: 'Authorized RAG Queries',
+                        data: [12, 19, 15, 25, 22, 18, successfulQueries],
+                        borderColor: '#6FA8FF',
+                        backgroundColor: 'rgba(111, 168, 255, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Blocked Security Events',
+                        data: [1, 2, 0, 3, 1, 0, permissionDenials],
+                        borderColor: '#E53E3E',
+                        backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

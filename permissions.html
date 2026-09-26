@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Permission Matrix | Permission-Aware Enterprise RAG{% endblock %}
+
+{% block header_title %}Visual Document Access Permission Matrix{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="margin-bottom: 24px;">
+    <h2 style="font-size: 1.4rem; margin-bottom: 6px;">Enterprise RBAC Permission Matrix</h2>
+    <p style="color: var(--muted-color); font-size: 0.9rem;">
+        Real-time visual map of which employee roles are authorized to retrieve each document during vector search.
+    </p>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 35%;">Document Title & Department</th>
+                <th style="width: 15%;">Classification</th>
+                {% for r in roles %}
+                <th style="text-align: center; width: 12.5%;">
+                    <div style="font-weight: 700; font-size: 0.9rem;">{{ r }}</div>
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in matrix %}
+            {% set doc = item.document %}
+            <tr>
+                <td>
+                    <div style="font-weight: 600; font-size: 0.95rem;">📄 {{ doc.title }}</div>
+                    <div style="font-size: 0.75rem; color: var(--muted-color);">Dept: <strong>{{ doc.department }}</strong> | Sensitivity: {{ doc.sensitivity }}</div>
+                </td>
+                <td>
+                    <span class="badge badge-{{ doc.classification.lower() }}">
+                        {{ doc.classification }}
+                    </span>
+                </td>
+                {% for r in roles %}
+                {% set acc = item.role_access[r] %}
+                <td style="text-align: center;">
+                    {% if acc.allowed %}
+                    <span class="badge badge-pass" style="padding: 6px 12px; font-size: 0.85rem;" title="{{ acc.reason }}">
+                        ✓ Allowed
+                    </span>
+                    {% else %}
+                    <span class="badge badge-denied" style="padding: 6px 12px; font-size: 0.85rem;" title="{{ acc.reason }}">
+                        ✕ Denied
+                    </span>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--muted-color); padding: 32px;">No documents available to display matrix.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

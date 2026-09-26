@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Enterprise Knowledge Assistant | RAG Query Interface{% endblock %}
+
+{% block header_title %}Enterprise Knowledge Assistant{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+
+    <!-- Top Info Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.85); padding: 14px 20px; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 32px; height: 32px; background: var(--lavender); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px;">🤖</div>
+            <div>
+                <span style="font-weight: 600; font-size: 0.95rem;">Permission-Aware RAG Engine</span>
+                <span style="font-size: 0.8rem; color: var(--muted-color); margin-left: 8px;">Scope: {{ user.role }} ({{ user.department }})</span>
+            </div>
+        </div>
+        <span class="badge badge-pass">🔐 PRE-RETRIEVAL ENFORCED</span>
+    </div>
+
+    <!-- Quick Example Queries Bar -->
+    <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--muted-color); align-self: center; white-space: nowrap;">Try Question:</span>
+        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; white-space: nowrap;" onclick="setQuery('What is the engineering project process?')">
+            📌 Engineering Project Guidelines
+        </button>
+        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; white-space: nowrap; background: var(--peach); color: #742A2A;" onclick="setQuery('Show me the salary information for the engineering department.')">
+            ⚠️ Engineering Salary (Test Restricted)
+        </button>
+        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; white-space: nowrap;" onclick="setQuery('What are the HR onboarding policies?')">
+            📋 HR Onboarding Policy
+        </button>
+        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; white-space: nowrap;" onclick="setQuery('What was announced in the company all-hands?')">
+            📢 Company Announcement
+        </button>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="chat-messages" id="chatMessages">
+        <div class="message-bubble assistant">
+            <div style="font-weight: 600; margin-bottom: 6px; color: var(--primary);">🤖 Enterprise Knowledge Assistant</div>
+            Hello <strong>{{ user.name }}</strong>! I am your secure Enterprise AI Assistant. You are currently signed in as <strong>{{ user.role }}</strong> in the <strong>{{ user.department }}</strong> department.
+            <br><br>
+            Every question you ask is pre-filtered by our <strong>Permission Engine</strong> so that unauthorized documents never reach the AI context.
+        </div>
+
+        {% for q in recent_queries[:3] %}
+        <div class="message-bubble user">
+            {{ q.query_text }}
+        </div>
+        <div class="message-bubble assistant">
+            <div style="font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between;">
+                <span>🤖 Enterprise Knowledge Assistant</span>
+                <span class="badge {% if q.authorization_status=='ALLOWED' %}badge-allowed{% else %}badge-denied{% endif %}">
+                    {{ q.authorization_status }}
+                </span>
+            </div>
+
+            <div style="white-space: pre-wrap; line-height: 1.6;">{{ q.answer_text }}</div>
+
+            {% if q.citations %}
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--glass-border);">
+                <div style="font-size: 0.8rem; font-weight: 600; color: var(--muted-color); margin-bottom: 6px;">📚 Citations & Sources:</div>
+                {% for cit in q.citations %}
+                <div class="citation-card">
+                    <strong>[{{ cit.index or loop.index }}] {{ cit.title }}</strong>
+                    <span class="badge badge-internal" style="font-size: 0.65rem; margin-left: 6px;">{{ cit.classification or 'INTERNAL' }}</span>
+                    <span style="color: var(--muted-color); font-size: 0.75rem; float: right;">Dept: {{ cit.department }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Input Form -->
+    <div class="glass-card" style="padding: 16px;">
+        <form id="ragForm" onsubmit="handleQuery(event)" style="display: flex; gap: 12px;">
+            <input type="text" id="queryInput" class="form-control" placeholder="Ask a question about your organization's knowledge..." required style="flex: 1;">
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="padding: 12px 24px;">
+                <span>Send</span> ➔
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+function setQuery(text) {
+    document.getElementById('queryInput').value = text;
+    document.getElementById('queryInput').focus();
+}
+
+async function handleQuery(event) {
+    event.preventDefault();
+    const input = document.getElementById('queryInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const query = input.value.trim();
+    if (!query) return;
+
+    const chatContainer = document.getElementById('chatMessages');
+
+    // Append User Message
+    const userBubble = document.createElement('div');
+    userBubble.className = 'message-bubble user';
+    userBubble.textContent = query;
+    chatContainer.appendChild(userBubble);
+
+    input.value = '';
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⚡ Processing...';
+
+    // Append Loading Assistant Message
+    const loadingBubble = document.createElement('div');
+    loadingBubble.className = 'message-bubble assistant';
+    loadingBubble.id = 'loadingMessage';
+    loadingBubble.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 6px;">🤖 Enterprise Security Pipeline Running...</div>
+        <div style="font-size: 0.85rem; color: var(--muted-color);">
+            1. Authenticating Identity... ✓<br>
+            2. Evaluating Role & Scope Permissions... ⚡<br>
+            3. Executing Metadata-Filtered Vector Retrieval...
+        </div>
+    `;
+    chatContainer.appendChild(loadingBubble);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    try {
+        const response = await fetch('/api/rag/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: query })
+        });
+        const data = await response.json();
+
+        // Remove loading
+        loadingBubble.remove();
+
+        const assistBubble = document.createElement('div');
+        assistBubble.className = 'message-bubble assistant';
+
+        const isAllowed = (data.status === 'ALLOWED');
+        const badgeClass = isAllowed ? 'badge-allowed' : 'badge-denied';
+
+        let secHTML = `
+            <div style="background: rgba(233, 226, 255, 0.4); padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.8rem; border: 1px solid var(--glass-border);">
+                <strong>🛡️ SECURITY CHECK:</strong>
+                <span style="color: var(--success-color); margin-left: 8px;">✓ User Authenticated</span> |
+                <span style="color: var(--success-color);">✓ Role Verified (${data.security_checks?.user_role || 'EMPLOYEE'})</span> |
+                <span style="color: var(--success-color);">✓ Permission Filter Applied</span>
+                ${data.excluded_chunks_count > 0 ? `<br><span style="color: var(--danger-color); font-weight: 600;">🚫 ${data.excluded_chunks_count} Unauthorized Document Chunks Blocked & Excluded from LLM Context</span>` : ''}
+            </div>
+        `;
+
+        let citationsHTML = '';
+        if (data.citations && data.citations.length > 0) {
+            citationsHTML = `
+                <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--glass-border);">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--muted-color); margin-bottom: 8px;">📚 Citations & Verified Sources:</div>
+                    ${data.citations.map(c => `
+                        <div class="citation-card">
+                            <strong>[${c.index}] ${c.title}</strong>
+                            <span class="badge badge-internal" style="font-size: 0.65rem; margin-left: 6px;">${c.classification}</span>
+                            <span style="color: var(--muted-color); font-size: 0.75rem; float: right;">Dept: ${c.department} (Score: ${c.relevance_score})</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        assistBubble.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-weight: 600; color: var(--primary);">🤖 Enterprise Knowledge Assistant</span>
+                <span class="badge ${badgeClass}">${data.status}</span>
+            </div>
+            ${secHTML}
+            <div style="white-space: pre-wrap; line-height: 1.6; margin-top: 8px;">${data.answer}</div>
+            ${citationsHTML}
+        `;
+
+        chatContainer.appendChild(assistBubble);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    } catch (err) {
+        loadingBubble.remove();
+        alert('Error executing RAG query: ' + err);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Send</span> ➔';
+    }
+}
+</script>
+{% endblock %}

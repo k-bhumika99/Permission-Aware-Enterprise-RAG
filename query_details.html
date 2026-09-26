@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Query Execution Inspection | Permission-Aware RAG{% endblock %}
+
+{% block header_title %}Query Execution & Citation Inspection{% endblock %}
+
+{% block content %}
+
+{% if error %}
+<div class="glass-card" style="border-left: 5px solid var(--danger-color);">
+    <h3 style="color: var(--danger-color);">Access Restricted</h3>
+    <p>{{ error }}</p>
+    <a href="{{ url_for('dashboard_bp.dashboard_view') }}" class="btn btn-secondary" style="margin-top: 16px;">Back to Dashboard</a>
+</div>
+{% else %}
+
+<div class="glass-card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+            <h2 style="font-size: 1.4rem;">Query Record #{{ query_record.id }}</h2>
+            <p style="color: var(--muted-color); font-size: 0.85rem;">Timestamp: {{ query_record.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC') if query_record.timestamp else '' }}</p>
+        </div>
+        <span class="badge {% if query_record.authorization_status=='ALLOWED' %}badge-allowed{% else %}badge-denied{% endif %}" style="font-size: 0.9rem; padding: 8px 16px;">
+            {{ query_record.authorization_status }}
+        </span>
+    </div>
+
+    <div style="background: rgba(248,251,255,0.8); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); margin-bottom: 20px;">
+        <div style="font-size: 0.85rem; font-weight: 600; color: var(--muted-color); margin-bottom: 4px;">USER QUERY PROMPT:</div>
+        <div style="font-size: 1.1rem; font-weight: 600;">"{{ query_record.query_text }}"</div>
+    </div>
+
+    <!-- Security Metadata Grid -->
+    <div class="grid-4" style="margin-bottom: 20px;">
+        <div class="stat-card" style="padding: 14px;">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--muted-color);">User Identity</div>
+                <div style="font-weight: 600; font-size: 0.95rem;">{{ query_record.user_name }}</div>
+                <div style="font-size: 0.75rem;">Role: {{ query_record.user_role }} ({{ query_record.user_department }})</div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="padding: 14px;">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--muted-color);">Chunks Retrieved</div>
+                <div style="font-weight: 600; font-size: 0.95rem; color: var(--success-color);">{{ query_record.retrieved_chunks_count }} Authorized Chunks</div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="padding: 14px;">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--muted-color);">Chunks Blocked</div>
+                <div style="font-weight: 600; font-size: 0.95rem; color: var(--danger-color);">{{ query_record.excluded_chunks_count }} Unauthorized Blocked</div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="padding: 14px;">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--muted-color);">Execution Latency</div>
+                <div style="font-weight: 600; font-size: 0.95rem;">{{ query_record.execution_time_ms }} ms</div>
+            </div>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.1rem; margin-bottom: 12px;">LLM Response Output</h3>
+    <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); line-height: 1.6; margin-bottom: 24px;">
+        {{ query_record.answer_text }}
+    </div>
+
+    {% if query_record.citations %}
+    <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Authorized Document Citations</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for c in query_record.citations %}
+        <div class="citation-card" style="padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>[{{ c.index or loop.index }}] {{ c.title }}</strong>
+                <span class="badge badge-internal">{{ c.classification or 'INTERNAL' }}</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--muted-color); margin-top: 4px;">
+                Department: {{ c.department }} | Document ID: #{{ c.document_id }} | Vector Relevance Score: {{ c.relevance_score }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+{% endif %}
+{% endblock %}
